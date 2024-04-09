@@ -14,7 +14,8 @@ After=network.target
 [Service]
 User=ray
 WorkingDirectory=/home/ray/nginx-server
-Enviroment="PATH=/home/ray/env/nginx/bin/gunicorn --workers 3 --bind:0.0.0.0:8000 wsgi:app"
+Environment="PATH=/home/ray/env/nginx/bin"
+ExecStart=/home/ray/env/nginx/bin/gunicorn --workers 3 --bind 0.0.0.0:8000 wsgi:app
 
 [Install]
 WantedBy=multi-user.target
@@ -33,7 +34,7 @@ server {
 
     location /api {
         # Define the reverse proxy settings
-        proxy_pass http://127.0.0.1:8080;
+        proxy_pass http://127.0.0.1:8000;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
@@ -41,4 +42,35 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
 
 }
+```
+
+```
+/app.py
+from flask import Flask, render_template, jsonify, request, abort
+
+app = Flask(__name__)
+
+@app.route("/api")
+def home():
+    return render_template("base.html")
+
+@app.route("/api/test")
+def test():
+    return render_template("test.html")
+
+@app.route("/api/about")
+def about():
+    return render_template("about.html")
+
+
+if __name__ == "__main__":
+    app.run(debug=True, port=8000)
+```
+
+```
+/wsgi.py
+from app import app
+
+if __name__ == '__main__':
+    app.run()
 ```
