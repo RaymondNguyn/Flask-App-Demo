@@ -1,7 +1,7 @@
-Install python
+Create virtual enviroment
 `python3 -m venv ~/env/nginx`
 
-Create virtual enviroment
+Initalize it
 `source ~/env/nginx/bin/activate`
 
 
